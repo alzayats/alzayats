@@ -1,6 +1,6 @@
 - 👋 Hi, I’m Alzayat Saleh
 - 👀 Interested in Deep Learning
-- 🌱 Currently PhD Candidate
+- 🌱 Currently PostDoc @ AIMS
 - 💞️ Looking to collaborate on Computer vision
 - 📫 How to reach me www.alzayat.com
 - ✨ Check my [Scholar profile](https://scholar.google.com/citations?user=OaFJvaIAAAAJ&hl=en)
