@@ -1,6 +1,5 @@
-<h1 align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=28&duration=4000&pause=1000&color=0891B2&center=true&vCenter=true&random=false&width=600&lines=Hi+%F0%9F%91%8B+I'm+Alzayat+Saleh;Deep+Learning+%C3%97+Marine+Science;Postdoctoral+Research+Fellow;Building+AI+for+the+Ocean" alt="Typing SVG" />
-</h1>
+<h1 align="center">Alzayat Saleh</h1>
+<h3 align="center">Deep Learning · Computer Vision · Marine Science</h3>
 
 <p align="center">
   <a href="http://www.alzayat.com"><img src="https://img.shields.io/badge/Website-alzayat.com-0891B2?style=for-the-badge&logo=safari&logoColor=white" /></a>
@@ -16,10 +15,10 @@
 
 I'm a **Postdoctoral Research Fellow** at [AIMS@JCU](https://www.aims.gov.au/) (Australian Institute of Marine Science / James Cook University) based in Townsville, North Queensland. My work sits at the intersection of **deep learning**, **computer vision**, and **marine science** -- building AI systems that help us understand and monitor ocean ecosystems at scale.
 
-- 🐟 &nbsp; Creator of the [DeepFish](https://github.com/alzayats/DeepFish) dataset -- a benchmark for underwater fish analysis
-- 🌊 &nbsp; Building tools for automated reef monitoring, fish measurement, and underwater image quality assessment
-- 🧠 &nbsp; Passionate about making deep learning practical for ecological research
-- 🌐 &nbsp; Full publication list and research portfolio at [alzayats.github.io](https://alzayats.github.io/)
+- Creator of the [DeepFish](https://github.com/alzayats/DeepFish) dataset -- a benchmark for underwater fish analysis
+- Building tools for automated reef monitoring, fish measurement, and underwater image quality assessment
+- Focused on making deep learning practical for ecological research
+- Full publication list and research portfolio at [alzayats.github.io](https://alzayats.github.io/)
 
 ### Scholar Stats
 
@@ -43,7 +42,7 @@ I'm a **Postdoctoral Research Fellow** at [AIMS@JCU](https://www.aims.gov.au/) (
 <table>
   <tr>
     <td width="50%" valign="top">
-      <h3 align="center">🐟 DeepFish</h3>
+      <h3 align="center">DeepFish</h3>
       <p align="center">
         <a href="https://github.com/alzayats/DeepFish">
           <img src="https://img.shields.io/github/stars/alzayats/DeepFish?style=flat-square&color=0891B2" />
@@ -54,7 +53,7 @@ I'm a **Postdoctoral Research Fellow** at [AIMS@JCU](https://www.aims.gov.au/) (
       </p>
     </td>
     <td width="50%" valign="top">
-      <h3 align="center">🌊 UDnet</h3>
+      <h3 align="center">UDnet</h3>
       <p align="center">
         <a href="https://github.com/alzayats/UDnet">
           <img src="https://img.shields.io/github/stars/alzayats/UDnet?style=flat-square&color=0891B2" />
@@ -72,10 +71,10 @@ I'm a **Postdoctoral Research Fellow** at [AIMS@JCU](https://www.aims.gov.au/) (
 ### Research Domains
 
 ```
-🪸 Coral Reef Monitoring        ──  Large-scale underwater image stitching & LTMP analysis
-📏 AutoFish Vision Pro           ──  AI-powered non-invasive fish measurement for aquaculture
-📷 Underwater Image Quality      ──  Automated IQA for marine monitoring pipelines
-🗺️ Habitat Mapping               ──  Deep learning for benthic and geomorphic classification
+Coral Reef Monitoring        ──  Large-scale underwater image stitching & LTMP analysis
+AutoFish Vision Pro          ──  AI-powered non-invasive fish measurement for aquaculture
+Underwater Image Quality     ──  Automated IQA for marine monitoring pipelines
+Habitat Mapping              ──  Deep learning for benthic and geomorphic classification
 ```
 
 ---
@@ -109,10 +108,6 @@ I'm a **Postdoctoral Research Fellow** at [AIMS@JCU](https://www.aims.gov.au/) (
 ---
 
 <p align="center">
-  <img src="https://komarev.com/ghpvc/?username=alzayats&color=0891B2&style=flat-square&label=Profile+Views" />
-</p>
-
-<p align="center">
   <b>Open to collaborations in AI, marine robotics, and agricultural tech.</b><br/>
-  <a href="https://alzayats.github.io/#connect">📬 Get in touch</a> · <a href="https://alzayats.github.io/#publications">📄 View publications</a>
+  <a href="https://alzayats.github.io/#connect">Get in touch</a> · <a href="https://alzayats.github.io/#publications">View publications</a>
 </p>
