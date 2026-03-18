@@ -1,0 +1,34 @@
+{
+  "citations": 1055,
+  "h_index": 15,
+  "i10_index": 17,
+  "pub_count": 37,
+  "top_papers": [
+    {
+      "title": "A realistic fish-habitat dataset to evaluate algorithms for underwater visual analysis",
+      "citations": 233,
+      "year": "2020"
+    },
+    {
+      "title": "Computer vision and deep learning for fish classification in underwater habitats: A survey",
+      "citations": 167,
+      "year": "2022"
+    },
+    {
+      "title": "Automatic weight estimation of harvested fish from images",
+      "citations": 99,
+      "year": "2019"
+    },
+    {
+      "title": "Applications of deep learning in fish habitat monitoring: A tutorial and survey",
+      "citations": 85,
+      "year": "2024"
+    },
+    {
+      "title": "Underwater fish detection with weak multi-domain supervision",
+      "citations": 63,
+      "year": "2019"
+    }
+  ],
+  "source": "Google Scholar"
+}
