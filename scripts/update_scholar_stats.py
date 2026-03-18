@@ -1,7 +1,7 @@
 """
-Fetch Google Scholar stats and update README.md with live data.
-Uses the scholarly library with fallback to direct HTML scraping.
-Designed to run in GitHub Actions on a weekly schedule.
+Fetch Google Scholar stats via SerpAPI and update README.md.
+SerpAPI free tier: 100 searches/month (we use ~4/month).
+Sign up at https://serpapi.com to get your API key.
 """
 
 import re
@@ -11,98 +11,96 @@ import sys
 import time
 from pathlib import Path
 from datetime import datetime, timezone
+import requests
 
 
-def fetch_with_scholarly(scholar_id: str) -> dict | None:
-    """Fetch author stats using the scholarly library."""
+SCHOLAR_ID = os.environ.get("SCHOLAR_ID", "OaFJvaIAAAAJ")
+SERPAPI_KEY = os.environ.get("SERPAPI_KEY", "")
+README_PATH = os.environ.get("README_PATH", "README.md")
+
+
+def fetch_google_scholar(scholar_id: str, api_key: str) -> dict | None:
+    """Fetch author stats from Google Scholar via SerpAPI."""
     try:
-        from scholarly import scholarly
+        # Get author profile with citation stats
+        url = "https://serpapi.com/search.json"
+        params = {
+            "engine": "google_scholar_author",
+            "author_id": scholar_id,
+            "api_key": api_key,
+        }
 
-        search = scholarly.search_author_id(scholar_id)
-        author = scholarly.fill(search, sections=["basics", "indices", "publications"])
+        print(f"[GS] Fetching profile for author ID: {scholar_id}")
+        resp = requests.get(url, params=params, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
 
-        publications = author.get("publications", [])
-        pub_count = len(publications)
-        citations = author.get("citedby", 0)
-        h_index = author.get("hindex", 0)
-        i10_index = author.get("i10index", 0)
+        # Extract citation stats
+        cited_by = data.get("cited_by", {})
+        table = cited_by.get("table", [])
 
-        # Get top 5 cited papers
+        citations_all = 0
+        h_index = 0
+        i10_index = 0
+
+        for row in table:
+            if "citations" in row:
+                citations_all = row["citations"].get("all", 0)
+            elif "h_index" in row:
+                h_index = row["h_index"].get("all", 0)
+            elif "i10_index" in row:
+                i10_index = row["i10_index"].get("all", 0)
+
+        # Extract top articles (sorted by citations by default)
+        articles = data.get("articles", [])
         top_papers = []
-        for pub in sorted(publications, key=lambda p: p.get("num_citations", 0), reverse=True)[:5]:
-            bib = pub.get("bib", {})
+        for article in articles[:5]:
             top_papers.append({
-                "title": bib.get("title", "Unknown"),
-                "citations": pub.get("num_citations", 0),
-                "year": bib.get("pub_year", "N/A"),
+                "title": article.get("title", "Unknown"),
+                "citations": article.get("cited_by", {}).get("value", 0),
+                "year": article.get("year", "N/A") or "N/A",
             })
 
-        return {
-            "citations": citations,
+        # Count total publications from the first page
+        pub_count = len(articles)
+
+        # Paginate to count all publications (uses 1 API call per page)
+        next_link = data.get("serpapi_pagination", {}).get("next")
+        while next_link and pub_count < 500:
+            time.sleep(1)
+            resp2 = requests.get(next_link + f"&api_key={api_key}", timeout=30)
+            if resp2.ok:
+                page_data = resp2.json()
+                page_articles = page_data.get("articles", [])
+                if not page_articles:
+                    break
+                pub_count += len(page_articles)
+                next_link = page_data.get("serpapi_pagination", {}).get("next")
+            else:
+                break
+
+        author_name = data.get("author", {}).get("name", "Unknown")
+        stats = {
+            "citations": citations_all,
             "h_index": h_index,
             "i10_index": i10_index,
             "pub_count": pub_count,
             "top_papers": top_papers,
+            "source": "Google Scholar",
         }
-    except Exception as e:
-        print(f"[scholarly] Failed: {e}")
-        return None
+        print(f"[GS] Success for {author_name}: {stats['citations']:,} citations, "
+              f"h-index {stats['h_index']}, i10-index {stats['i10_index']}, "
+              f"{stats['pub_count']} publications")
+        return stats
 
-
-def fetch_with_requests(scholar_id: str) -> dict | None:
-    """Fallback: scrape Google Scholar profile page directly."""
-    try:
-        import requests
-        from bs4 import BeautifulSoup
-
-        url = f"https://scholar.google.com/citations?user={scholar_id}&hl=en"
-        headers = {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/120.0.0.0 Safari/537.36"
-            )
-        }
-
-        resp = requests.get(url, headers=headers, timeout=30)
-        resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "html.parser")
-
-        # Extract citation indices table
-        index_cells = soup.select("#gsc_rsb_st td.gsc_rsb_std")
-        if len(index_cells) >= 2:
-            citations = int(index_cells[0].text.strip())
-            h_index = int(index_cells[2].text.strip())
-            i10_index = int(index_cells[4].text.strip()) if len(index_cells) > 4 else 0
+    except requests.exceptions.HTTPError as e:
+        if e.response is not None and e.response.status_code == 401:
+            print("[GS] ERROR: Invalid SerpAPI key. Check your SERPAPI_KEY secret.")
         else:
-            return None
-
-        # Count publications
-        pub_rows = soup.select("#gsc_a_b .gsc_a_tr")
-        pub_count = len(pub_rows)
-
-        # Get top papers from the visible table
-        top_papers = []
-        for row in pub_rows[:5]:
-            title_el = row.select_one(".gsc_a_at")
-            cite_el = row.select_one(".gsc_a_c a")
-            year_el = row.select_one(".gsc_a_y span")
-            if title_el:
-                top_papers.append({
-                    "title": title_el.text.strip(),
-                    "citations": int(cite_el.text.strip()) if cite_el and cite_el.text.strip() else 0,
-                    "year": year_el.text.strip() if year_el else "N/A",
-                })
-
-        return {
-            "citations": citations,
-            "h_index": h_index,
-            "i10_index": i10_index,
-            "pub_count": pub_count,
-            "top_papers": top_papers,
-        }
+            print(f"[GS] HTTP error: {e}")
+        return None
     except Exception as e:
-        print(f"[requests] Failed: {e}")
+        print(f"[GS] Failed: {e}")
         return None
 
 
@@ -112,14 +110,7 @@ def update_readme(stats: dict, readme_path: str = "README.md") -> bool:
     content = path.read_text(encoding="utf-8")
 
     now = datetime.now(timezone.utc).strftime("%B %d, %Y")
-
-    # Build the stats block
-    top_papers_rows = ""
-    for p in stats.get("top_papers", [])[:5]:
-        title = p["title"]
-        if len(title) > 70:
-            title = title[:67] + "..."
-        top_papers_rows += f"| {title} | {p['citations']:,} | {p['year']} |\n"
+    scholar_link = f"https://scholar.google.com/citations?user={SCHOLAR_ID}&hl=en"
 
     stats_block = f"""<!-- SCHOLAR_STATS:START - Auto-generated by GitHub Action, do not edit -->
 <table>
@@ -127,14 +118,13 @@ def update_readme(stats: dict, readme_path: str = "README.md") -> bool:
     <td align="center"><strong>{stats['citations']:,}</strong><br/>Citations</td>
     <td align="center"><strong>{stats['h_index']}</strong><br/>h-index</td>
     <td align="center"><strong>{stats['i10_index']}</strong><br/>i10-index</td>
-    <td align="center"><strong>{stats['pub_count']}+</strong><br/>Publications</td>
+    <td align="center"><strong>{stats['pub_count']}</strong><br/>Publications</td>
   </tr>
 </table>
 
-<sub>Last updated: {now} | Source: <a href="https://scholar.google.com/citations?user={os.environ.get('SCHOLAR_ID', 'OaFJvaIAAAAJ')}&hl=en">Google Scholar</a></sub>
+<sub>Last updated: {now} via {stats.get('source', 'Google Scholar')} | <a href="{scholar_link}">View full profile</a></sub>
 <!-- SCHOLAR_STATS:END -->"""
 
-    # Replace between markers
     pattern = r"<!-- SCHOLAR_STATS:START.*?-->.*?<!-- SCHOLAR_STATS:END -->"
     new_content, count = re.subn(pattern, stats_block, content, flags=re.DOTALL)
 
@@ -143,37 +133,36 @@ def update_readme(stats: dict, readme_path: str = "README.md") -> bool:
         return False
 
     path.write_text(new_content, encoding="utf-8")
-    print(f"[OK] README updated: {stats['citations']:,} citations, h-index {stats['h_index']}, {stats['pub_count']}+ publications")
+    print(f"[OK] README updated with Google Scholar data")
     return True
 
 
 def main():
-    scholar_id = os.environ.get("SCHOLAR_ID", "OaFJvaIAAAAJ")
-    readme_path = os.environ.get("README_PATH", "README.md")
+    if not SERPAPI_KEY:
+        print("[ERROR] SERPAPI_KEY not set. Add it as a repository secret.")
+        print("  1. Go to https://serpapi.com and sign up (free)")
+        print("  2. Copy your API key")
+        print("  3. In your repo: Settings > Secrets > Actions > New secret")
+        print("     Name: SERPAPI_KEY")
+        print("     Value: your-api-key")
+        sys.exit(1)
 
-    print(f"Fetching stats for Scholar ID: {scholar_id}")
+    print(f"Fetching Google Scholar stats for ID: {SCHOLAR_ID}")
+    stats = fetch_google_scholar(SCHOLAR_ID, SERPAPI_KEY)
 
-    # Try scholarly first, fall back to direct scraping
-    stats = fetch_with_scholarly(scholar_id)
     if stats is None:
-        print("Trying fallback method...")
-        time.sleep(2)
-        stats = fetch_with_requests(scholar_id)
-
-    if stats is None:
-        print("[ERROR] Could not fetch scholar stats with any method.")
-        # Save last known stats if available
         cache_path = Path("scholar_cache.json")
         if cache_path.exists():
             print("[INFO] Using cached stats from previous run.")
             stats = json.loads(cache_path.read_text())
         else:
+            print("[ERROR] Could not fetch stats and no cache available.")
             sys.exit(1)
 
-    # Cache the stats for future fallback
+    # Cache for future fallback
     Path("scholar_cache.json").write_text(json.dumps(stats, indent=2))
 
-    if not update_readme(stats, readme_path):
+    if not update_readme(stats, README_PATH):
         sys.exit(1)
 
 
