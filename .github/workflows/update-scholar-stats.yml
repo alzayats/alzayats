@@ -23,22 +23,14 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: |
-          pip install scholarly requests beautifulsoup4
+        run: pip install requests
 
-      - name: Restore stats cache
-        continue-on-error: true
-        run: |
-          if [ -f scholar_cache.json ]; then
-            echo "Cache found"
-          fi
-
-      - name: Fetch Scholar stats and update README
+      - name: Fetch Google Scholar stats and update README
         env:
           SCHOLAR_ID: OaFJvaIAAAAJ
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
           README_PATH: README.md
-        run: |
-          python scripts/update_scholar_stats.py
+        run: python scripts/update_scholar_stats.py
 
       - name: Commit and push changes
         run: |
