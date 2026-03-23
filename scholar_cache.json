@@ -1,12 +1,12 @@
 {
-  "citations": 1055,
+  "citations": 1065,
   "h_index": 15,
   "i10_index": 17,
   "pub_count": 37,
   "top_papers": [
     {
       "title": "A realistic fish-habitat dataset to evaluate algorithms for underwater visual analysis",
-      "citations": 233,
+      "citations": 238,
       "year": "2020"
     },
     {
@@ -16,7 +16,7 @@
     },
     {
       "title": "Automatic weight estimation of harvested fish from images",
-      "citations": 99,
+      "citations": 100,
       "year": "2019"
     },
     {
