@@ -1,17 +1,17 @@
 {
-  "citations": 1075,
+  "citations": 1085,
   "h_index": 15,
-  "i10_index": 17,
+  "i10_index": 18,
   "pub_count": 37,
   "top_papers": [
     {
       "title": "A realistic fish-habitat dataset to evaluate algorithms for underwater visual analysis",
-      "citations": 242,
+      "citations": 247,
       "year": "2020"
     },
     {
       "title": "Computer vision and deep learning for fish classification in underwater habitats: A survey",
-      "citations": 168,
+      "citations": 169,
       "year": "2022"
     },
     {
@@ -21,12 +21,12 @@
     },
     {
       "title": "Applications of deep learning in fish habitat monitoring: A tutorial and survey",
-      "citations": 86,
+      "citations": 87,
       "year": "2024"
     },
     {
       "title": "Adaptive deep learning framework for robust unsupervised underwater image enhancement",
-      "citations": 64,
+      "citations": 65,
       "year": "2025"
     }
   ],
