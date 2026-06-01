@@ -1,12 +1,12 @@
 {
-  "citations": 1170,
+  "citations": 1181,
   "h_index": 15,
   "i10_index": 18,
-  "pub_count": 38,
+  "pub_count": 20,
   "top_papers": [
     {
       "title": "A realistic fish-habitat dataset to evaluate algorithms for underwater visual analysis",
-      "citations": 258,
+      "citations": 259,
       "year": "2020"
     },
     {
@@ -26,7 +26,7 @@
     },
     {
       "title": "Adaptive deep learning framework for robust unsupervised underwater image enhancement",
-      "citations": 75,
+      "citations": 77,
       "year": "2025"
     }
   ],
